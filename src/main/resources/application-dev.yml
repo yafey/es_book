@@ -1,0 +1,6 @@
+spring:
+  thymeleaf:
+    cache: false
+  http:
+      multipart:
+        location: E:\lida-es

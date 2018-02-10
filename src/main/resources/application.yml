@@ -1,0 +1,72 @@
+spring:
+  profiles:
+    active: dev
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: dulida
+    url: jdbc:mysql://127.0.0.1:3306/lida-es?characterEncoding=utf-8&useSSL=false
+    #由于Druid暂时不在Spring Boot中的直接支持，故需要进行配置信息的定制 springboot默认的pool为JDBC Connection Pool。
+    type: com.alibaba.druid.pool.DruidDataSource
+    # 下面为连接池的补充设置，应用到上面所有数据源中
+    # 初始化大小，最小，最大
+    initialSize: 5
+    minIdle: 5
+    maxActive: 20
+    # 配置获取连接等待超时的时间
+    maxWait: 60000
+    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+    timeBetweenEvictionRunsMillis: 60000
+    # 配置一个连接在池中最小生存的时间，单位是毫秒
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    # 打开PSCache，并且指定每个连接上PSCache的大小
+    poolPreparedStatements: true
+    maxPoolPreparedStatementPerConnectionSize: 20
+    # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+    filters: stat,wall,log4j
+    # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+    # 合并多个DruidDataSource的监控数据
+    useGlobalDataSourceStat: true
+  jpa:
+    show-sql: true
+    hibernate:
+      #ddl-auto: create   #可根据entity再数据库生成表
+      ddl-auto: validate
+      #ddl-auto: update
+  thymeleaf:
+    mode: HTML #注意这里要写HTML 而不是 HTML5
+    suffix: .html
+    prefix: classpath:/templates/
+  devtools:
+    restart:
+      exclude: templates/**,static/** #因为配置了thymeleaf的缓存禁用，所以关闭修改页面或静态文件时的熱加载
+  http:
+    multipart:
+      enabled: true
+      file-size-threshold: 5MB
+      max-request-size: 20MB
+server:
+  #context-path: /lida-es   设置了这个的话前端的html的静态文件引用需用 类似的request.contextPath东西，   不设置的话可直接从/static写起
+  port: 8080
+  error:
+    whitelabel:
+      enabled: false #禁用springboot默认的whitelabel错误页面
+elasticsearch:
+  cluster:
+    name: lida
+  host: 127.0.0.1
+  port: 9300
+redis:
+  host: 127.0.0.1
+  port: 6379
+  timeout: 10
+  password:
+  poolMaxTotal: 1000
+  poolMaxIdle: 500
+  poolMaxWait: 50
+  database: 3

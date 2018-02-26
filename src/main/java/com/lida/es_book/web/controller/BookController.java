@@ -5,6 +5,7 @@ import com.lida.es_book.entity.Book;
 import com.lida.es_book.service.book.BookService;
 import com.lida.es_book.web.dto.LoginUser;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,7 +36,8 @@ public class BookController {
     @GetMapping("/list")
     public String list(Model model, LoginUser loginUser) {
         model.addAttribute("loginUser", loginUser);
-        model.addAttribute("bookList", bookService.findBooks());
+        Page<Book> books = bookService.findBooks();
+        model.addAttribute("books", books);
         return "/book/list";
     }
 

@@ -1,0 +1,30 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<!--paginationSize是要显示多少个页码-->
+<div th:fragment="page"
+     th:with="paginationSize=5,
+                current=${pageObj.number+1},
+                begin=${1 gt (current - paginationSize/2) ? 1 : (current - paginationSize/2)},
+                end=${begin + (paginationSize - 1) lt pageObj.getTotalPages() ? begin + (paginationSize - 1) :  pageObj.getTotalPages()}"
+     >
+    <ul class="pagination">
+        <li th:if="${pageObj.hasPrevious()}"><a>&lt;&lt;yes</a></li><!--首页-->
+        <li th:if="${pageObj.hasPrevious()}"><a>&lt;yes</a></li><!--上一页-->
+        <li th:unless="${pageObj.hasPrevious()}"><a>&lt;&lt;no</a></li><!--首页-->
+        <li th:unless="${pageObj.hasPrevious()}"><a>&lt;no</a></li><!--上一页-->
+
+        <li th:class="${current == i ? 'active' : '' }" th:each="i : ${#numbers.sequence( begin, end)}">
+            <a  th:text="${i}" href="javascript:void(0)"></a>
+        </li>
+
+        <li th:if="${pageObj.hasNext()}"><a href="javascript:void(0)">&gt;yes</a></li><!--下一页-->
+        <li th:if="${pageObj.hasNext()}"><a href="javascript:void(0)">&gt;&gt;yes</a></li><!--末页-->
+        <li th:unless="${pageObj.hasNext()}"><a href="javascript:void(0)">&gt;no</a></li><!--下一页-->
+        <li th:unless="${pageObj.hasNext()}"><a href="javascript:void(0)">&gt;&gt;no</a></li><!--末页-->
+    </ul>
+    <br>
+    current: <input type="text" th:value="${current}"><br>
+    paginationSize :<input type="text" th:value="${paginationSize}"><br>
+    begin: <input type="text" th:value="${begin}"><br>
+    end: <input type="text" th:value="${end}"><br>
+    totalPages: <input type="text" th:value="${pageObj.getTotalPages()}"><br>
+</div>

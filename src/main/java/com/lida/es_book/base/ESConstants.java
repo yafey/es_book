@@ -9,4 +9,6 @@ public interface ESConstants {
      int SALT_SIZE = 8;
 
      String COOKIE_NAME_TOKEN = "lida-es-token";
+
+     int PAGE_SIZE = 10;
 }

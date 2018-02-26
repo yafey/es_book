@@ -31,12 +31,12 @@
         </tr>
         </thead>
         <tbody>
-        <tr  th:each="book,iterStat : ${bookList}">
+        <tr  th:each="book,iterStat : ${books.content}">
             <td th:text="${iterStat.count}"></td>
             <td th:text="${book.name}"></td>
             <td th:text="${book.author}"></td>
             <td th:text="${book.price}"></td>
-            <td th:text="${#dates.format(publishingTime, 'yyyy-MM-dd')}"></td>
+            <td th:text="${#dates.format(book.publishingTime, 'yyyy-MM-dd')}"></td>
             <td th:text="${book.categoryName}"></td>
             <td th:text="${book.keyWord}"></td>
             <td>
@@ -46,6 +46,7 @@
         </tr>
         </tbody>
     </table>
+    <div th:replace="page :: page (pageObj=${books})"></div>
 </div>
 <div th:replace="common :: footer"></div>
 

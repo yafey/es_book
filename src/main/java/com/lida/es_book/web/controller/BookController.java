@@ -5,8 +5,10 @@ import com.lida.es_book.entity.Book;
 import com.lida.es_book.service.book.BookService;
 import com.lida.es_book.web.dto.LoginUser;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +35,7 @@ public class BookController {
     @GetMapping("/list")
     public String list(Model model, LoginUser loginUser) {
         model.addAttribute("loginUser", loginUser);
+        model.addAttribute("bookList", bookService.findBooks());
         return "/book/list";
     }
 
@@ -57,17 +60,30 @@ public class BookController {
     }
 
     @PostMapping(value = "/add")
-    public String add(@Valid Book book) {
-        //TODO
-        return "redirect:/book/list";
+    @ResponseBody
+    public ApiResponse add(@Valid Book book,BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ApiResponse(HttpStatus.BAD_REQUEST.value(), bindingResult.getAllErrors().get(0).getDefaultMessage(), null);
+        }
+        book = bookService.add(book);
+        return ApiResponse.ofSuccess(book);
     }
 
     @PostMapping(value = "/update")
-    public String update(@ModelAttribute("book")Book book) {
-        //TODO
-        return "redirect:/book/list";
+    @ResponseBody
+    public ApiResponse update(@Valid @ModelAttribute("book")Book book, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ApiResponse(HttpStatus.BAD_REQUEST.value(), bindingResult.getAllErrors().get(0).getDefaultMessage(), null);
+        }
+        book = bookService.update(book);
+        return ApiResponse.ofSuccess(book);
     }
 
+    @GetMapping("/delete/{id}")
+    public String delete(@PathVariable("id")String id, Model model, LoginUser loginUser) {
+        bookService.deleteBook(id);
+        return "redirect:/book/list";
+    }
 
 
     /**

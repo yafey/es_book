@@ -9,7 +9,7 @@
 <div th:replace="common :: header"></div>
 <div class="row">
     <div class="col-xs-9 col-sm-9 col-md-9  col-lg-9">
-        <h5>书籍</h5>
+        <h5>书籍列表</h5>
     </div>
     <div class="col-xs-3 col-sm-3 col-md-3  col-lg-3">
         <a href="/book/add" class="btn btn-link pull-right">添加书籍</a>
@@ -27,10 +27,23 @@
             <th>出版时间</th>
             <th>类别</th>
             <th>关键词</th>
+            <th>操作</th>
         </tr>
         </thead>
         <tbody>
-
+        <tr  th:each="book,iterStat : ${bookList}">
+            <td th:text="${iterStat.count}"></td>
+            <td th:text="${book.name}"></td>
+            <td th:text="${book.author}"></td>
+            <td th:text="${book.price}"></td>
+            <td th:text="${#dates.format(publishingTime, 'yyyy-MM-dd')}"></td>
+            <td th:text="${book.categoryName}"></td>
+            <td th:text="${book.keyWord}"></td>
+            <td>
+                <a th:href="@{/book/update/{id}(id=${book.id})}">更新</a>
+                <a th:href="@{/book/delete/{id}(id=${book.id})}">删除</a>
+            </td>
+        </tr>
         </tbody>
     </table>
 </div>

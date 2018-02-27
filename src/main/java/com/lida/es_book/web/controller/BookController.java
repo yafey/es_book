@@ -1,5 +1,6 @@
 package com.lida.es_book.web.controller;
 
+import com.lida.es_book.base.ApiDataTableResponse;
 import com.lida.es_book.base.ApiResponse;
 import com.lida.es_book.entity.Book;
 import com.lida.es_book.service.book.BookService;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.List;
 
 /*
  *Created by LidaDu on 2018/2/5.  
@@ -33,13 +35,34 @@ public class BookController {
         return ApiResponse.ofSuccess(null);
     }
 
-    @GetMapping("/list")
+    @GetMapping("/list1")
     public String list(Model model, LoginUser loginUser) {
         model.addAttribute("loginUser", loginUser);
         Page<Book> books = bookService.findBooks();
         model.addAttribute("books", books);
+        return "/book/list1";
+    }
+
+    @GetMapping("/list")
+    public String toList(Model model, LoginUser loginUser) {
+        model.addAttribute("loginUser", loginUser);
         return "/book/list";
     }
+
+    @PostMapping("/list")
+    @ResponseBody
+    public ApiDataTableResponse dataTableList() {
+        List<Book> re = bookService.findBooks().getContent();
+        ApiDataTableResponse response = new ApiDataTableResponse(ApiResponse.Status.SUCCESS);
+        response.setData(re);
+        response.setRecordsFiltered(Long.valueOf(re.size()));
+        response.setRecordsTotal(Long.valueOf(re.size()));
+
+        response.setDraw(1);
+        return response;
+    }
+
+
 
     @GetMapping("/add")
     public String toAdd(Model model, LoginUser loginUser) {

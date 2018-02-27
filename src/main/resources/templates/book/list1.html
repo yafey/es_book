@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Book List</title>
+    <div th:replace="common :: head"></div>
+</head>
+<body>
+<div th:replace="common :: header"></div>
+<div class="row">
+    <div class="col-xs-9 col-sm-9 col-md-9  col-lg-9">
+        <h5>书籍列表</h5>
+    </div>
+    <div class="col-xs-3 col-sm-3 col-md-3  col-lg-3">
+        <a href="/book/add" class="btn btn-link pull-right">添加书籍</a>
+    </div>
+</div>
+<hr/>
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>序号</th>
+            <th>名称</th>
+            <th>作者</th>
+            <th>单价</th>
+            <th>出版时间</th>
+            <th>类别</th>
+            <th>关键词</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr  th:each="book,iterStat : ${books.content}">
+            <td th:text="${iterStat.count}"></td>
+            <td th:text="${book.name}"></td>
+            <td th:text="${book.author}"></td>
+            <td th:text="${book.price}"></td>
+            <td th:text="${#dates.format(book.publishingTime, 'yyyy-MM-dd')}"></td>
+            <td th:text="${book.categoryName}"></td>
+            <td th:text="${book.keyWord}"></td>
+            <td>
+                <a th:href="@{/book/update/{id}(id=${book.id})}">更新</a>
+                <a th:href="@{/book/delete/{id}(id=${book.id})}">删除</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div th:replace="page :: page (pageObj=${books})"></div>
+</div>
+<div th:replace="common :: footer"></div>
+
+</body>
+</html>

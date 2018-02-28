@@ -15,6 +15,65 @@
         <a href="/book/add" class="btn btn-link pull-right">添加书籍</a>
     </div>
 </div>
+<div class="row">
+    <form class="form-horizontal" id="bookForm" >
+        <div class="form-group">
+            <label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label">书籍名称</label>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <input type="text" class="form-control" id="name" name="name" placeholder="请输入书籍名称" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label">作者</label>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <input type="text" class="form-control" id="author" name="author" placeholder="请输入作者" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label">minPrice</label>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <input type="text" class="form-control" id="minPrice" name="minPrice" placeholder="请输入单价" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label">maxPrice</label>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <input type="text" class="form-control" id="maxPrice" name="maxPrice" placeholder="请输入单价" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label">minTime</label>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <input type="text" onclick="WdatePicker({ maxDate:'#F{$dp.$D(\'maxTime\')||\'%y-%M-%d\'}' })" class="input-text Wdate" id="minTime" name="minTime" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label">maxTime</label>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <input type="text" onclick="WdatePicker({ minDate:'#F{$dp.$D(\'minTime\')}',maxDate:'%y-%M-%d' })" class="input-text Wdate" id="maxTime" name="maxTime" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label">类别</label>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <select class="form-control" name="categoryId" id="categoryId">
+                    <option value="">全部</option>
+                    <option th:each="category,iterStat  : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label">关键词</label>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <input type="text" class="form-control" id="keyWord" name="keyWord" placeholder="请输入关键词">
+            </div>
+        </div>
+        <div class="col-xs-6 col-xs-offset-2 col-sm-6 col-sm-offset-2 col-md-6  col-md-offset-2 col-lg-6 col-sm-lg-2 ">
+            <button type="button" id="backBtn" class="btn btn-primary save">返回</button>
+            <button type="button" id="submitBtn" class="btn btn-primary  save">确定</button>
+        </div>
+    </form>
+</div>
 <hr/>
 <div class="table-responsive">
     <table id="bookTable" class="table table-bordered">
@@ -35,83 +94,6 @@
     </table>
 </div>
 <div th:replace="common :: footer"></div>
-<script type="text/javascript">
-        var table = $("#bookTable").dataTable({
-            "pageLength": 3, // 配置单页显示条数
-            "paging": true, // 关闭本地分页
-            "lengthChange": false, // 不允许用户改变表格每页显示的记录数
-            "searching": false, // 不允许Datatables开启本地搜索
-            "ordering": true, // 启用Datatables排序
-            "info": true, // 表格左边显示搜索信息
-            "autoWidth": true, // 自动计算表格宽度
-            "stateSave": false, // 允许表格缓存Datatables，以便下次恢复之前的状态
-            "retrieve": true, // 如果已经初始化了，则继续使用之前的Datatables实例
-            "processing": true, // 显示正在处理的状态
-            "serverSide": true, // 服务器模式，数据由服务器掌控
-            "pagingType": "simple_numbers", // 翻页显示: 上一页和下一页两个按钮，加上页数按钮
-            "language": {
-                "sProcessing": "处理中...",
-                "sLengthMenu": "显示 _MENU_ 项结果",
-                "sZeroRecords": "没有匹配结果",
-                "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
-                "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
-                "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
-                "sInfoPostFix": "",
-                "sUrl": "",
-                "sEmptyTable": "未搜索到数据",
-                "sLoadingRecords": "载入中...",
-                "sInfoThousands": ",",
-                "oPaginate": {
-                    "sFirst": "首页",
-                    "sPrevious": "上页",
-                    "sNext": "下页",
-                    "sLast": "末页"
-                },
-                "oAria": {
-                    "sSortAscending": ": 以升序排列此列",
-                    "sSortDescending": ": 以降序排列此列"
-                }
-            },
-            columns: [{ // 绑定数据源
-                data: "name",
-            }, {
-                data: "author",
-            }, {
-                data: "price",
-            }, {
-                data: "publishingTime",
-            }, {
-                data: "categoryName",
-            }, {
-                data: "keyWord",
-            },  {
-                data: null
-            }],
-            columnDefs: [
-                { // 定义表格样式
-                    targets: 3,
-                    render: function (data, type, row, meta) {
-                        return (new Date(data)).Format("yyyy-MM-dd");
-                    }
-                }, {
-                    targets: 6,
-                    render: function (data, type, row, meta) {
-                        return '<td><a href="/book/update/'+row.id+'">更新</a>' +
-                            '<a href=/book/delete/'+row.id+'">删除</a></td>';
-                    }
-                }],
-            ajax: {
-                type: "POST",
-                url: "/book/list", // 服务器url
-                cache: false,
-                data: function (data) {
-                    console.log(data);
-                    return data;
-                }
-
-            }
-        });
-
-</script>
+<script type="text/javascript" src="/static/js/list.js"></script>
 </body>
 </html>

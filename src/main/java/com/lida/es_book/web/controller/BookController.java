@@ -5,6 +5,7 @@ import com.lida.es_book.base.ApiResponse;
 import com.lida.es_book.entity.Book;
 import com.lida.es_book.service.book.BookService;
 import com.lida.es_book.web.dto.LoginUser;
+import com.lida.es_book.web.form.DataTableSearch;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -46,19 +47,20 @@ public class BookController {
     @GetMapping("/list")
     public String toList(Model model, LoginUser loginUser) {
         model.addAttribute("loginUser", loginUser);
+        model.addAttribute("categories", bookService.findAllCategory());
         return "/book/list";
     }
 
     @PostMapping("/list")
     @ResponseBody
-    public ApiDataTableResponse dataTableList() {
-        List<Book> re = bookService.findBooks().getContent();
+    public ApiDataTableResponse dataTableList(@ModelAttribute DataTableSearch searchBody) {
+        Page<Book> bookPage = bookService.findForDataTable(searchBody);
         ApiDataTableResponse response = new ApiDataTableResponse(ApiResponse.Status.SUCCESS);
-        response.setData(re);
-        response.setRecordsFiltered(Long.valueOf(re.size()));
-        response.setRecordsTotal(Long.valueOf(re.size()));
+        response.setData(bookPage.getContent());
+        response.setRecordsFiltered(bookPage.getTotalElements());
+        response.setRecordsTotal(bookPage.getTotalElements());
 
-        response.setDraw(1);
+        response.setDraw(searchBody.getDraw());
         return response;
     }
 

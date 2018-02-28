@@ -1,12 +1,14 @@
 package com.lida.es_book.base;
 
 /*
+ * dataTables响应
+ * dataTables要求数据格式
  *Created by LidaDu on 2018/2/27.  
  */
 public class ApiDataTableResponse extends ApiResponse{
-    private int draw;
-    private long recordsTotal;
-    private long recordsFiltered;
+    private int draw;//用于验证结果
+    private long recordsTotal;//总数
+    private long recordsFiltered;//用于分页
 
     public ApiDataTableResponse(ApiResponse.Status status) {
         this(status.getCode(), status.getStandardMessage(), null);

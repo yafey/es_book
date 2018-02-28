@@ -19,6 +19,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -54,7 +55,43 @@ public class BookService {
         Sort sort = new Sort(Sort.Direction.fromString(searchBody.getDirection()), searchBody.getOrderBy());
         int page = searchBody.getStart() / searchBody.getLength();
         Pageable pageable = new PageRequest(page, searchBody.getLength(), sort);
-        Page<Book> books = bookDao.findAll(pageable);
+        /*Specification<Book> specification = new Specification<Book>() {
+            @Override
+            public Predicate toPredicate(Root<Book> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                return null;
+            }
+        };*/
+        Specification<Book> specification = (root, query, cb) -> {
+            List<Predicate> list = new ArrayList<Predicate>();
+
+            if(searchBody.getName()!=null ){
+                list.add(cb.like(root.get("name"), "%"+searchBody.getName()+"%"));
+            }
+            if(searchBody.getAuthor()!=null ){
+                list.add(cb.like(root.get("author"), "%"+searchBody.getAuthor()+"%"));
+            }
+            if(searchBody.getMinPrice()!=null ){
+                list.add(cb.ge(root.get("price"),searchBody.getMinPrice()));
+            }
+            if(searchBody.getMaxPrice()!=null ){
+                list.add(cb.le(root.get("price"),searchBody.getMaxPrice()));
+            }
+            if(searchBody.getCategoryId()!=null ){
+                list.add(cb.equal(root.get("categoryId"), searchBody.getCategoryId()));
+            }
+            if(searchBody.getKeyWord()!=null ){
+                list.add(cb.like(root.get("keyWord"), "%"+searchBody.getKeyWord()+"%"));
+            }
+            if(searchBody.getMinTime()!=null ){
+                list.add(cb.greaterThanOrEqualTo(root.get("publishingTime"),searchBody.getMinTime()));
+            }
+            if(searchBody.getMaxTime()!=null ){
+                list.add(cb.lessThanOrEqualTo(root.get("publishingTime"),searchBody.getMaxTime()));
+            }
+            Predicate[] p = new Predicate[list.size()];
+            return cb.and(list.toArray(p));
+        };
+        Page<Book> books = bookDao.findAll(specification, pageable);
         return books;
     }
 

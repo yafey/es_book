@@ -30,6 +30,7 @@ public class DataTableSearch {
     private String keyWord;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date minTime;//出版时间
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date maxTime;//出版时间
 
     /*排序*/

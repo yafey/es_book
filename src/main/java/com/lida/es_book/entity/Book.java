@@ -39,6 +39,5 @@ public class Book extends IdEntity{
     @NotBlank
     private String categoryId;//类别
     private String categoryName;//类别
-    @NotBlank
-    private String keyWord;
+
 }

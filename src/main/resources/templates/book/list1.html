@@ -26,7 +26,6 @@
             <th>单价</th>
             <th>出版时间</th>
             <th>类别</th>
-            <th>关键词</th>
             <th>操作</th>
         </tr>
         </thead>
@@ -38,7 +37,6 @@
             <td th:text="${book.price}"></td>
             <td th:text="${#dates.format(book.publishingTime, 'yyyy-MM-dd')}"></td>
             <td th:text="${book.categoryName}"></td>
-            <td th:text="${book.keyWord}"></td>
             <td>
                 <a th:href="@{/book/update/{id}(id=${book.id})}">更新</a>
                 <a th:href="@{/book/delete/{id}(id=${book.id})}">删除</a>

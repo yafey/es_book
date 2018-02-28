@@ -1,6 +1,7 @@
 package com.lida.es_book;
 
 import com.lida.es_book.base.ESConstants;
+import com.lida.es_book.entity.Book;
 import com.lida.es_book.entity.Category;
 import com.lida.es_book.entity.User;
 import com.lida.es_book.repository.CategoryDao;
@@ -13,6 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -51,6 +54,14 @@ public class EsBookApplicationTests {
 		//将得到的散列转换为十六进制字符串
 		user.setPassword(Encodes.encodeHex(hashPassword));
 		return user;
+	}
+
+	@Test
+	public void addBook() {
+		List<Category> categories = (List<Category>) categoryDao.findAll();
+		for (int i = 0; i < 100000; i++) {
+			Book book = new Book();
+		}
 	}
 
 }

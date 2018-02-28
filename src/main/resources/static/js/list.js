@@ -48,8 +48,6 @@ $(function () {
             }, {
                 data: "categoryName",
             }, {
-                data: "keyWord",
-            },  {
                 data: null,
                 orderable: false
             }
@@ -61,7 +59,7 @@ $(function () {
                     return (new Date(data)).Format("yyyy-MM-dd");
                 }
             }, {
-                targets: 6,
+                targets: 5,
                 render: function (data, type, row, meta) {
                     return '<td><a href="/book/update/'+row.id+'">更新</a>' +
                         '<a href=/book/delete/'+row.id+'">删除</a></td>';
@@ -112,9 +110,7 @@ $(function () {
                 if (categoryId.length > 0) {
                     postData.categoryId = categoryId;
                 }
-                if (keyWord.length > 0) {
-                    postData.keyWord = keyWord;
-                }
+
                 console.log(postData);
                 return postData;
             }

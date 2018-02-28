@@ -27,7 +27,6 @@ public class DataTableSearch {
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
     private String categoryId;//类别
-    private String keyWord;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date minTime;//出版时间
     @DateTimeFormat(pattern = "yyyy-MM-dd")

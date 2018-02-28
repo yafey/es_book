@@ -79,9 +79,6 @@ public class BookService {
             if(searchBody.getCategoryId()!=null ){
                 list.add(cb.equal(root.get("categoryId"), searchBody.getCategoryId()));
             }
-            if(searchBody.getKeyWord()!=null ){
-                list.add(cb.like(root.get("keyWord"), "%"+searchBody.getKeyWord()+"%"));
-            }
             if(searchBody.getMinTime()!=null ){
                 list.add(cb.greaterThanOrEqualTo(root.get("publishingTime"),searchBody.getMinTime()));
             }

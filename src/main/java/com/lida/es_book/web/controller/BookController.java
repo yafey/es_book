@@ -6,6 +6,7 @@ import com.lida.es_book.entity.Book;
 import com.lida.es_book.service.book.BookService;
 import com.lida.es_book.web.dto.LoginUser;
 import com.lida.es_book.web.form.DataTableSearch;
+import com.lida.es_book.web.form.PageSearch;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -36,11 +37,18 @@ public class BookController {
         return ApiResponse.ofSuccess(null);
     }
 
-    @GetMapping("/list1")
-    public String list(Model model, LoginUser loginUser) {
+    @RequestMapping("/list1")
+    public String list(Model model, LoginUser loginUser, @ModelAttribute PageSearch searchBody) {
+        Long now = System.currentTimeMillis();
+        if (searchBody.getOrderBy() == null) {
+            searchBody.setOrderBy("price");
+        }
         model.addAttribute("loginUser", loginUser);
-        Page<Book> books = bookService.findBooks();
+        Page<Book> books = bookService.findForPage(searchBody);
         model.addAttribute("books", books);
+        model.addAttribute("searchBody", searchBody);
+        model.addAttribute("categories", bookService.findAllCategory());
+        System.out.println(System.currentTimeMillis() - now + "-------------------------------");
         return "/book/list1";
     }
 
@@ -54,6 +62,7 @@ public class BookController {
     @PostMapping("/list")
     @ResponseBody
     public ApiDataTableResponse dataTableList(@ModelAttribute DataTableSearch searchBody) {
+        Long now = System.currentTimeMillis();
         Page<Book> bookPage = bookService.findForDataTable(searchBody);
         ApiDataTableResponse response = new ApiDataTableResponse(ApiResponse.Status.SUCCESS);
         response.setData(bookPage.getContent());
@@ -61,6 +70,7 @@ public class BookController {
         response.setRecordsTotal(bookPage.getTotalElements());
 
         response.setDraw(searchBody.getDraw());
+        System.out.println(System.currentTimeMillis() - now + "-------------------------------");
         return response;
     }
 

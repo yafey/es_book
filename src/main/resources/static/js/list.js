@@ -1,7 +1,7 @@
 $(function () {
     var table = $("#bookTable").DataTable({
         "order": [[3, "desc"]],//默认创建时间排序
-        "pageLength": 3, // 配置单页显示条数
+        "pageLength": 10, // 配置单页显示条数
         "paging": true, // 关闭本地分页
         "lengthChange": false, // 不允许用户改变表格每页显示的记录数
         "searching": false, // 不允许Datatables开启本地搜索

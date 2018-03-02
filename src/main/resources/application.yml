@@ -62,7 +62,7 @@ elasticsearch:
   host: 127.0.0.1
   port: 9300
 redis:
-  host: 127.0.0.1
+  host: localhost
   port: 6379
   timeout: 10
   password:

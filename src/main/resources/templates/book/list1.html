@@ -15,6 +15,59 @@
         <a href="/book/add" class="btn btn-link pull-right">添加书籍</a>
     </div>
 </div>
+<div class="row">
+    <form class="form-horizontal" id="bookForm" method="post" action="/book/list1" th:object="${searchBody}">
+        <div class="form-group">
+            <label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label">pageNumber</label>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <input type="text" class="form-control" id="pageNumber" name="pageNumber"  th:value="*{pageNumber}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label">keyWord</label>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <input type="text" class="form-control" id="keyWord" name="keyWord" placeholder="请输入关键词" th:value="*{keyWord}" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label">minPrice</label>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <input type="text" class="form-control" id="minPrice" name="minPrice" placeholder="请输入单价" th:value="*{minPrice}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label">maxPrice</label>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <input type="text" class="form-control" id="maxPrice" name="maxPrice" placeholder="请输入单价" th:value="*{maxPrice}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label">minTime</label>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <input type="text" onclick="WdatePicker({ maxDate:'#F{$dp.$D(\'maxTime\')||\'%y-%M-%d\'}' })" class="input-text Wdate" id="minTime" name="minTime"  th:value="*{#dates.format(minTime, 'yyyy-MM-dd')}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label">maxTime</label>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <input type="text" onclick="WdatePicker({ minDate:'#F{$dp.$D(\'minTime\')}',maxDate:'%y-%M-%d' })" class="input-text Wdate" id="maxTime" name="maxTime" th:value="*{#dates.format(maxTime, 'yyyy-MM-dd')}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label">类别</label>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <select class="form-control" name="categoryId" id="categoryId">
+                    <option value="">全部</option>
+                    <option th:each="category,iterStat  : ${categories}" th:value="${category.id}" th:text="${category.name}" th:selected="(${searchBody.categoryId} == ${category.id})"></option>
+                </select>
+            </div>
+        </div>
+        <div class="col-xs-6 col-xs-offset-2 col-sm-6 col-sm-offset-2 col-md-6  col-md-offset-2 col-lg-6 col-sm-lg-2 ">
+            <button type="button" id="clearBtn" class="btn btn-primary save">重置</button>
+            <button type="button" id="submitBtn" class="btn btn-primary  save">确定</button>
+        </div>
+    </form>
+</div>
 <hr/>
 <div class="table-responsive">
     <table class="table table-bordered">
@@ -46,7 +99,7 @@
     </table>
     <div th:replace="page :: page (pageObj=${books})"></div>
 </div>
-<div th:replace="common :: footer"></div>
-
+<!--<div th:replace="common :: footer"></div>-->
+<script type="text/javascript" src="/static/js/list1.js"></script>
 </body>
 </html>

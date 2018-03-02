@@ -3,10 +3,7 @@ package com.lida.es_book.redis;
 import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.ScanParams;
-import redis.clients.jedis.ScanResult;
+import redis.clients.jedis.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +16,9 @@ public class RedisService {
 
     @Autowired
     private JedisPool jedisPool;
+
+   /* @Autowired
+    private JedisCluster jedisCluster;*/
 
     /**
      * 获取当个对象
@@ -67,8 +67,10 @@ public class RedisService {
             int seconds =  prefix.expireSeconds();
             if(seconds <= 0) {
                 jedis.set(realKey, str);
+                //jedisCluster.set(realKey, str);
             }else {
                 jedis.setex(realKey, seconds, str);
+                //jedisCluster.setex(realKey, seconds, str);
             }
             return true;
         }finally {

@@ -47,7 +47,7 @@
             <label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label">类别</label>
             <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                 <select class="form-control" name="categoryId" id="categoryId">
-                    <option th:each="category,iterStat  : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                    <option th:each="category,iterStat  : ${categories}"  th:selected="(${book.categoryId} == ${category.id})" th:value="${category.id}" th:text="${category.name}"></option>
                 </select>
             </div>
         </div>

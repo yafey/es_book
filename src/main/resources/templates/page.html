@@ -3,8 +3,8 @@
 <div th:fragment="page"
      th:with="paginationSize=5,
                 current=${pageObj.number+1},
-                begin=${1 gt (current - paginationSize/2) ? 1 : (current - paginationSize/2)},
-                end=${begin + (paginationSize - 1) lt pageObj.getTotalPages() ? begin + (paginationSize - 1) :  pageObj.getTotalPages()}"
+                begin=${T(Math).max(1, (current - paginationSize/2).intValue())},
+                end=${T(Math).min((begin + (paginationSize - 1)).intValue(), (pageObj.getTotalPages()).intValue())}"
      >
     <ul class="pagination">
         <li th:onclick="'javascript:toPage(1)'"  th:if="${pageObj.hasPrevious()}"><a href="javascript:void(0)">&lt;&lt;</a></li><!--首页-->
@@ -12,7 +12,7 @@
         <li th:unless="${pageObj.hasPrevious()}"><a href="javascript:void(0)">&lt;&lt;</a></li><!--首页-->
         <li th:unless="${pageObj.hasPrevious()}"><a href="javascript:void(0)">&lt;</a></li><!--上一页-->
 
-        <li th:onclick="'javascript:toPage('+${i}+')'" th:class="${current == i ? 'active' : '' }" th:each="i : ${#numbers.sequence( begin, end)}">
+        <li th:onclick="'javascript:toPage('+${i}+')'" th:class="${current == i ? 'active' : '' }" th:each="i : ${#numbers.sequence( begin, end)}" th:unless="${i == 0}">
             <a th:text="${i}" href="javascript:void(0)"></a>
         </li>
 

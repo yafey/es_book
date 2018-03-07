@@ -62,7 +62,7 @@ $(function () {
                 targets: 5,
                 render: function (data, type, row, meta) {
                     return '<td><a href="/book/update/'+row.id+'">更新</a>' +
-                        '<a href=/book/delete/'+row.id+'">删除</a></td>';
+                        '<a href="/book/delete/'+row.id+'">删除</a></td>';
                 }
             }],
         ajax: {

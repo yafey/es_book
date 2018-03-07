@@ -6,6 +6,8 @@ import com.lida.es_book.entity.Book;
 import com.lida.es_book.repository.BookDao;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -26,7 +28,7 @@ import javax.annotation.Resource;
 @Slf4j
 public class SearchService {
 
-    private static final String INDEX_NAME = "esBook";
+    private static final String INDEX_NAME = "esbook";
     private static final String INDEX_TYPE = "book";
     private static final String INDEX_TOPIC = "book_build";
 
@@ -40,24 +42,45 @@ public class SearchService {
     @Resource
     private ObjectMapper objectMapper;
 
-    public void index(String bookId) {
-        Book book = bookDao.findOne(bookId);
-        if (book == null) {
-            log.error("Index book {} dose not exist!", bookId);
-            return;
+    public boolean index(Book book) {
+        if (book == null || book.getId() == null) {
+            log.error("Index book {} dose not exist!", book);
+            return false;
         }
         BookIndexTemplate bookIndexTemplate = new BookIndexTemplate();
         modelMapper.map(book, bookIndexTemplate);
-        //create
-        //update
-        //deleteAndCreate比如数据过多
+
+        SearchRequestBuilder builder = this.esClient.prepareSearch(INDEX_NAME).setTypes(INDEX_TYPE)
+                .setQuery(QueryBuilders.termQuery(BookIndexKey.BOOK_ID, book.getId()));
+        log.info(builder.toString());
+        SearchResponse response =builder.get();
+        boolean success;
+        long totalHit = response.getHits().getTotalHits();
+        if (totalHit == 0) {
+            //create
+            success = create(bookIndexTemplate);
+        } else if (totalHit == 1) {
+            //update
+            String esId = response.getHits().getAt(0).getId();
+            success = update(esId, bookIndexTemplate);
+        } else {
+            //deleteAndCreate比如数据过多  kafka异步队列有可能会造成消息重复消费
+            success = deleteAndCreate(totalHit, bookIndexTemplate);
+        }
+
+        if (success) {
+            log.info("Index success with book" + book.getId());
+        }
+
+        return success;
+
     }
 
     private boolean create(BookIndexTemplate bookIndexTemplate) {
         try {
             IndexResponse response = this.esClient.prepareIndex(INDEX_NAME, INDEX_TYPE)
                     .setSource(objectMapper.writeValueAsBytes(bookIndexTemplate), XContentType.JSON).get();
-            log.debug("Create index with book: " + bookIndexTemplate.getBookId());
+            log.info("Create index with book: " + bookIndexTemplate.getBookId());
             if (response.status() == RestStatus.CREATED) {
                 return true;
             } else {
@@ -73,7 +96,7 @@ public class SearchService {
         try {
             UpdateResponse response = this.esClient.prepareUpdate(INDEX_NAME, INDEX_TYPE, esId)
                     .setDoc(objectMapper.writeValueAsBytes(bookIndexTemplate), XContentType.JSON).get();
-            log.debug("Create index with book: " + bookIndexTemplate.getBookId());
+            log.info("Update index with book: " + bookIndexTemplate.getBookId());
             if (response.status() == RestStatus.OK) {
                 return true;
             } else {
@@ -91,12 +114,12 @@ public class SearchService {
      * @param bookIndexTemplate
      * @return
      */
-    private boolean deleteAndCreate(int totalHit, BookIndexTemplate bookIndexTemplate) {
+    private boolean deleteAndCreate(long totalHit, BookIndexTemplate bookIndexTemplate) {
         DeleteByQueryRequestBuilder builder = DeleteByQueryAction.INSTANCE
                 .newRequestBuilder(esClient)
                 .filter(QueryBuilders.termQuery(BookIndexKey.BOOK_ID,bookIndexTemplate.getBookId()))
                 .source(INDEX_NAME);
-        log.debug("Delete by query for book: " + builder);
+        log.info("Delete by query for book: " + builder);
         BulkByScrollResponse response = builder.get();
         long deleted = response.getDeleted();
         if(deleted != totalHit) {
@@ -106,4 +129,16 @@ public class SearchService {
             return create(bookIndexTemplate);
         }
     }
+
+    public void remove(String bookId) {
+        DeleteByQueryRequestBuilder builder = DeleteByQueryAction.INSTANCE
+                .newRequestBuilder(esClient)
+                .filter(QueryBuilders.termQuery(BookIndexKey.BOOK_ID,bookId))
+                .source(INDEX_NAME);
+        log.info("Delete by query for book: " + builder);
+        BulkByScrollResponse response = builder.get();
+        long deleted = response.getDeleted();
+        log.info("Delete total: " + deleted);
+    }
+
 }

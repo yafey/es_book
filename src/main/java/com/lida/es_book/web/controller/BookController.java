@@ -117,9 +117,10 @@ public class BookController {
     }
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable("id")String id, Model model, LoginUser loginUser) {
+    public String delete(@PathVariable("id")String id, LoginUser loginUser) {
         bookService.deleteBook(id);
-        return "redirect:/book/list";
+        //return "redirect:/book/list";
+        return "redirect:/book/list1";
     }
 
 

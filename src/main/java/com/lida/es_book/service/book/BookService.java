@@ -3,6 +3,7 @@ package com.lida.es_book.service.book;
 import com.lida.es_book.base.ESConstants;
 import com.lida.es_book.entity.Book;
 import com.lida.es_book.entity.Category;
+import com.lida.es_book.esSearch.SearchService;
 import com.lida.es_book.repository.BookDao;
 import com.lida.es_book.repository.CategoryDao;
 import com.lida.es_book.web.form.DataTableSearch;
@@ -34,6 +35,8 @@ public class BookService {
     private CategoryDao categoryDao;
     @Resource
     private BookDao bookDao;
+    @Resource
+    private SearchService searchService;
 
     public List<Category> findAllCategory () {
         return (List<Category>) categoryDao.findAll();
@@ -43,8 +46,10 @@ public class BookService {
         return bookDao.findOne(id);
     }
 
+    @Transactional
     public void deleteBook(String id) {
         bookDao.delete(id);
+        searchService.remove(id);
     }
 
     public Page<Book> findForPage(PageSearch pageSearch) {
@@ -124,6 +129,7 @@ public class BookService {
     public Book add(Book book) {
         book.setCategoryName(categoryDao.findOne(Integer.valueOf(book.getCategoryId())).getName());
         book = bookDao.save(book);
+        searchService.index(book);
         return book;
     }
 
@@ -131,6 +137,7 @@ public class BookService {
     public Book update(Book book) {
         book.setCategoryName(categoryDao.findOne(Integer.valueOf(book.getCategoryId())).getName());
         book = bookDao.save(book);
+        searchService.index(book);
         return book;
     }
 

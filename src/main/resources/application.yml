@@ -60,7 +60,7 @@ elasticsearch:
   cluster:
     name: lida
   host: 127.0.0.1
-  port: 9300
+  port: 9300 #tcp的9300而不是http的9200
 redis:
   host: localhost
   port: 6379

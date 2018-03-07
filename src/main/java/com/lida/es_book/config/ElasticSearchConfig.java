@@ -29,13 +29,11 @@ public class ElasticSearchConfig {
     public TransportClient esClient() throws UnknownHostException {
         Settings settings = Settings.builder()
                 .put("cluster.name", this.esName)
-//                .put("cluster.name", "elasticsearch")
-                .put("client.transport.sniff", true)
+                .put("client.transport.sniff", true)//自动发现节点
                 .build();
 
         InetSocketTransportAddress master = new InetSocketTransportAddress(
                 InetAddress.getByName(esHost), esPort
-//          InetAddress.getByName("10.99.207.76"), 8999
         );
 
         TransportClient client = new PreBuiltTransportClient(settings)

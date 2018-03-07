@@ -1,0 +1,32 @@
+{
+  "settings":{
+    "number_of_replicas" : 0,
+    "number_of_shards" : 5
+  },
+  "mappings" : {
+    "book" : {
+      "dynamic" : false,
+      "properties" : {
+        "bookId" : {
+          "type" : "text"
+        },
+        "name": {
+          "type": "text"
+        },
+        "author": {
+          "type": "text"
+        },
+        "price": {
+          "type": "double"
+        },
+        "publishingTime": {
+          "type": "date",
+          "format": "strict_date_optional_time||epoch_millis"
+        },
+        "categoryId" : {
+          "type" : "keyword"
+        }
+      }
+    }
+  }
+}

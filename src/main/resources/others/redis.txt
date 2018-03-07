@@ -1,0 +1,4 @@
+cd到redis目录执行
+redis-server --service-install redis.windows.conf
+将redis安装为服务
+在服务中启动

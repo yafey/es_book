@@ -1,0 +1,33 @@
+修改yml文件 添加
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+启动命令 .\bin\elasticsearch
+
+
+安装head插件
+https://www.cnblogs.com/binshen/p/7419066.html
+切换npm为淘宝的镜像   npm install -g cnpm --registry=https://registry.npm.taobao.org
+1.全局安装grunt 构建工具 head通过grunt启动
+2.安装head  （在head文件夹 cnpm install）不要全局安装
+
+------------------------------------------------------------------------------------------------
+集群安装
+
+修改yml文件
+cluster.name: lida #集群名字
+node.name: master #节点名字
+node.master: true
+
+network.host: 127.0.0.1
+
+
+#slave ------> 解压elasticsearch-5.6.7.rar为其他名字 修改yml文件（不要复制原来解压好的文件夹）
+cluster.name: lida #集群名字，一定要与master的cluster一致
+node.name: slave1#节点名字
+
+network.host: 127.0.0.1
+http.port: 8200 #---->默认9200与master冲突
+
+discovery.zen.ping.unicast.hosts: ["127.0.0.1"]   #---->找到master，不加该配置则是游离的，找不到集群
+
+-------------------------------------------------------------------------------------------------

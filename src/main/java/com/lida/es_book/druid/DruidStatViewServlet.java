@@ -12,7 +12,7 @@ import javax.servlet.annotation.WebServlet;
 
         initParams={
 
-                @WebInitParam(name="allow",value="192.168.1.72,127.0.0.1"),// IP白名单(没有配置或者为空，则允许所有访问)
+                @WebInitParam(name="allow",value="192.168.1.72,127.0.0.1,192.168.41.1"),// IP白名单(没有配置或者为空，则允许所有访问)
 
                 @WebInitParam(name="deny",value="192.168.1.73"),// IP黑名单 (存在共同时，deny优先于allow)
 

@@ -5,7 +5,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     username: root
     password: dulida
-    url: jdbc:mysql://127.0.0.1:3306/lida-es?characterEncoding=utf-8&useSSL=false
+    url: jdbc:mysql://192.168.41.1:3306/lida-es?characterEncoding=utf-8&useSSL=false
     #由于Druid暂时不在Spring Boot中的直接支持，故需要进行配置信息的定制 springboot默认的pool为JDBC Connection Pool。
     type: com.alibaba.druid.pool.DruidDataSource
     # 下面为连接池的补充设置，应用到上面所有数据源中
@@ -59,10 +59,10 @@ server:
 elasticsearch:
   cluster:
     name: lida
-  host: 127.0.0.1
+  host: 192.168.41.1
   port: 9300 #tcp的9300而不是http的9200
 redis:
-  host: localhost
+  host: 192.168.41.1
   port: 6379
   timeout: 10
   password:

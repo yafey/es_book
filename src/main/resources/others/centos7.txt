@@ -1,3 +1,4 @@
+查看java进程 ps -ef|grep java    终止 kill -9 进程号
 一、卸载openjdk
 先查看 rpm -qa | grep java
 卸载 rpm -e --nodeps +软件名 注意只卸载openjdk及headless
@@ -11,3 +12,21 @@ export PATH=$PATH:$JAVA_HOME/bin
 
 保存完之后输入：source /etc/profile  命令使刚才配置的环境变量生效
 
+防火墙：
+
+>>> 关闭防火墙
+
+systemctl stop firewalld.service             #停止firewall
+systemctl disable firewalld.service        #禁止firewall开机启动
+
+>>> 开启端口
+firewall-cmd --zone=public --add-port=80/tcp --permanent
+firewall-cmd --zone=public --add-port=8080/tcp --permanent
+ 命令含义：
+--zone #作用域
+--add-port=80/tcp #添加端口，格式为：端口/通讯协议
+--permanent #永久生效，没有此参数重启后失效
+>>> 重启防火墙
+firewall-cmd --reload
+>>>查看开放状态
+firewall-cmd --list-port

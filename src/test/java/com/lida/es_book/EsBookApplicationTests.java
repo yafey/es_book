@@ -45,12 +45,12 @@ public class EsBookApplicationTests {
 
 	@Test
 	public void addUser() {
-		User user = new User();
+		/*User user = new User();
 		user.setTelephone("15027766011");
 		user.setPassword("123456");
 		user.setNickname("lida");
 		user = entryptPassword(user);
-		userDao.save(user);
+		userDao.save(user);*/
 	}
 
 	public User entryptPassword(User user) {
@@ -72,10 +72,10 @@ public class EsBookApplicationTests {
 	@Test
 	public void addBook() {
 
-		for (int i = 0; i <=100000; i++) {
+		/*for (int i = 0; i <=100000; i++) {
 			Book b = getBook();
 			bookDao.save(b);
-		}
+		}*/
 
 	}
 

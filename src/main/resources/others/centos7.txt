@@ -1,5 +1,3 @@
-设置非固定ip
-在centos7中设置 --->网络--->设置--->手动--->修改dhcp
 查看java进程 ps -ef|grep java    终止 kill -9 进程号
 一、卸载openjdk
 先查看 rpm -qa | grep java

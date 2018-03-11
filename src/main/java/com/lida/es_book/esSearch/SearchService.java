@@ -11,7 +11,6 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.DeleteByQueryAction;
@@ -19,9 +18,8 @@ import org.elasticsearch.index.reindex.DeleteByQueryRequestBuilder;
 import org.elasticsearch.rest.RestStatus;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -35,8 +33,9 @@ public class SearchService {
     private static final String INDEX_TYPE = "book";
     private static final String INDEX_TOPIC = "booktopic";
 
-    @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
+
+    @Autowired // 也可以注入JmsTemplate，JmsMessagingTemplate对JmsTemplate进行了封装
+    private JmsMessagingTemplate jmsTemplate;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -47,8 +46,9 @@ public class SearchService {
     @Resource
     private ObjectMapper objectMapper;
 
-    @KafkaListener(topics = INDEX_TOPIC)//Kafka监听topic
+    @JmsListener(destination = INDEX_TOPIC)
     private void handleMessage(String content) {
+        log.info("Received message : " + content);
         try {
             BookIndexMessage message = objectMapper.readValue(content, BookIndexMessage.class);
             switch (message.getOperation()) {
@@ -91,7 +91,6 @@ public class SearchService {
             String esId = response.getHits().getAt(0).getId();
             success = update(esId, bookIndexTemplate);
         } else {
-            //deleteAndCreate比如数据过多  kafka异步队列有可能会造成消息重复消费
             success = deleteAndCreate(totalHit, bookIndexTemplate);
         }
 
@@ -128,8 +127,9 @@ public class SearchService {
         }
         BookIndexMessage message = new BookIndexMessage(bookId, BookIndexMessage.INDEX, retry);
         try {
-            kafkaTemplate.send(INDEX_TOPIC, objectMapper.writeValueAsString(message));
-        }catch (JsonProcessingException e) {
+            jmsTemplate.convertAndSend(INDEX_TOPIC, objectMapper.writeValueAsString(message));
+        }catch (Exception e) {
+            e.printStackTrace();
             log.error("Json encode error for : " + message);
         }
 
@@ -196,7 +196,8 @@ public class SearchService {
         }
         BookIndexMessage message = new BookIndexMessage(bookId, BookIndexMessage.REMOVE, retry);
         try {
-            this.kafkaTemplate.send(INDEX_TOPIC, objectMapper.writeValueAsString(message));
+            //this.kafkaTemplate.send(INDEX_TOPIC, objectMapper.writeValueAsString(message));
+            this.jmsTemplate.convertAndSend(INDEX_TOPIC, objectMapper.writeValueAsString(message));
         } catch (JsonProcessingException e) {
             log.error("Cannot encode json for " + message, e);
         }

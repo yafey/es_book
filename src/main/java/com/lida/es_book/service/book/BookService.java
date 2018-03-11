@@ -129,7 +129,7 @@ public class BookService {
     public Book add(Book book) {
         book.setCategoryName(categoryDao.findOne(Integer.valueOf(book.getCategoryId())).getName());
         book = bookDao.save(book);
-        searchService.index(book);
+        searchService.index(book.getId());
         return book;
     }
 
@@ -137,7 +137,7 @@ public class BookService {
     public Book update(Book book) {
         book.setCategoryName(categoryDao.findOne(Integer.valueOf(book.getCategoryId())).getName());
         book = bookDao.save(book);
-        searchService.index(book);
+        searchService.index(book.getId());
         return book;
     }
 

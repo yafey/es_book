@@ -20,9 +20,12 @@ import org.elasticsearch.rest.RestStatus;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 
 @Service
 @Slf4j
@@ -30,8 +33,10 @@ public class SearchService {
 
     private static final String INDEX_NAME = "esbook";
     private static final String INDEX_TYPE = "book";
-    private static final String INDEX_TOPIC = "book_build";
+    private static final String INDEX_TOPIC = "booktopic";
 
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -42,10 +47,32 @@ public class SearchService {
     @Resource
     private ObjectMapper objectMapper;
 
-    public boolean index(Book book) {
-        if (book == null || book.getId() == null) {
-            log.error("Index book {} dose not exist!", book);
-            return false;
+    @KafkaListener(topics = INDEX_TOPIC)//Kafka监听topic
+    private void handleMessage(String content) {
+        try {
+            BookIndexMessage message = objectMapper.readValue(content, BookIndexMessage.class);
+            switch (message.getOperation()) {
+                case BookIndexMessage.INDEX:
+                    this.createOrUpdateIndex(message);
+                    break;
+                case BookIndexMessage.REMOVE:
+                    this.removeIndex(message);
+                    break;
+                default:
+                    log.warn("Not support message : " + message);
+                    break;
+
+            }
+        } catch (IOException e) {
+            log.error("Cannot parse json for : " + content, e);
+        }
+    }
+
+    private void createOrUpdateIndex(BookIndexMessage message) {
+        String bookId = message.getBookId();
+        Book book = bookDao.findOne(bookId);
+        if (book == null ) {
+            log.error("Index book {} dose not exist!", bookId);
         }
         BookIndexTemplate bookIndexTemplate = new BookIndexTemplate();
         modelMapper.map(book, bookIndexTemplate);
@@ -68,11 +95,43 @@ public class SearchService {
             success = deleteAndCreate(totalHit, bookIndexTemplate);
         }
 
-        if (success) {
+        if (!success) {
+            this.index(message.getBookId(), message.getRetry() + 1);
             log.info("Index success with book" + book.getId());
         }
 
-        return success;
+    }
+
+    private void removeIndex(BookIndexMessage message) {
+        String bookId = message.getBookId();
+        DeleteByQueryRequestBuilder builder = DeleteByQueryAction.INSTANCE
+                .newRequestBuilder(esClient)
+                .filter(QueryBuilders.termQuery(BookIndexKey.BOOK_ID,bookId))
+                .source(INDEX_NAME);
+        log.info("Delete by query for book: " + builder);
+        BulkByScrollResponse response = builder.get();
+        long deleted = response.getDeleted();
+        if (deleted <= 0) {
+            log.warn("Did not remove data from es for response : " + response);
+            this.remove(bookId, message.getRetry() + 1);
+        }
+    }
+
+    public void index(String bookId) {
+        this.index(bookId, 0);
+    }
+
+    public void index(String bookId, int retry) {
+        if (retry > BookIndexMessage.MAX_RETRY) {
+            log.error("Retry index times over 3 for book : " + bookId + " Please check it!");
+            return;
+        }
+        BookIndexMessage message = new BookIndexMessage(bookId, BookIndexMessage.INDEX, retry);
+        try {
+            kafkaTemplate.send(INDEX_TOPIC, objectMapper.writeValueAsString(message));
+        }catch (JsonProcessingException e) {
+            log.error("Json encode error for : " + message);
+        }
 
     }
 
@@ -130,15 +189,21 @@ public class SearchService {
         }
     }
 
+    public void remove(String bookId, int retry) {
+        if (retry > BookIndexMessage.MAX_RETRY) {
+            log.error("Retry remove times over 3 for book : " + bookId + " Please check it");
+            return;
+        }
+        BookIndexMessage message = new BookIndexMessage(bookId, BookIndexMessage.REMOVE, retry);
+        try {
+            this.kafkaTemplate.send(INDEX_TOPIC, objectMapper.writeValueAsString(message));
+        } catch (JsonProcessingException e) {
+            log.error("Cannot encode json for " + message, e);
+        }
+    }
+
     public void remove(String bookId) {
-        DeleteByQueryRequestBuilder builder = DeleteByQueryAction.INSTANCE
-                .newRequestBuilder(esClient)
-                .filter(QueryBuilders.termQuery(BookIndexKey.BOOK_ID,bookId))
-                .source(INDEX_NAME);
-        log.info("Delete by query for book: " + builder);
-        BulkByScrollResponse response = builder.get();
-        long deleted = response.getDeleted();
-        log.info("Delete total: " + deleted);
+        this.remove(bookId, 0);
     }
 
 }

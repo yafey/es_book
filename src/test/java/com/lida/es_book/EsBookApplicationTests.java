@@ -11,6 +11,7 @@ import com.lida.es_book.redis.RedisService;
 import com.lida.es_book.repository.BookDao;
 import com.lida.es_book.repository.CategoryDao;
 import com.lida.es_book.repository.UserDao;
+import com.lida.es_book.service.book.BookService;
 import com.lida.es_book.util.encryption.Digests;
 import com.lida.es_book.util.encryption.Encodes;
 import org.junit.Test;
@@ -42,6 +43,8 @@ public class EsBookApplicationTests {
 	private RedisService redisService;
 	@Resource
 	private SearchService searchService;
+	@Resource
+	private BookService bookService;
 
 	@Test
 	public void removeIndex() {
@@ -78,9 +81,9 @@ public class EsBookApplicationTests {
 	@Test
 	public void addBook() {
 
-		/*for (int i = 0; i <=100000; i++) {
+		/*for (int i = 0; i <=10000; i++) {
 			Book b = getBook();
-			bookDao.save(b);
+			bookService.add(b);
 		}*/
 
 	}

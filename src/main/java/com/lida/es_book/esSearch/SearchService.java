@@ -50,8 +50,8 @@ public class SearchService {
     @RabbitListener(queues = INDEX_QUEUE)//异步监听
     public void handleMessage(String content) throws InterruptedException {
         //Thread.sleep(10000l);   //页面并非sleep后才完成请求，异步监听
-        System.out.println("TreadName : " + Thread.currentThread().getName());
-        log.info("Received message : " + content);
+        //System.out.println("TreadName : " + Thread.currentThread().getName());
+        //log.info("Received message : " + content);
         try {
             BookIndexMessage message = objectMapper.readValue(content, BookIndexMessage.class);
             switch (message.getOperation()) {
@@ -119,7 +119,6 @@ public class SearchService {
         }
     }
 
-    @Async
     public void index(String bookId) {
         this.index(bookId, 0);
     }
@@ -207,7 +206,6 @@ public class SearchService {
         }
     }
 
-    @Async
     public void remove(String bookId) {
         this.remove(bookId, 0);
     }

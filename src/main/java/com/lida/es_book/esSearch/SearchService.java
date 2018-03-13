@@ -49,7 +49,7 @@ public class SearchService {
 
     @RabbitListener(queues = INDEX_QUEUE)//异步监听
     public void handleMessage(String content) throws InterruptedException {
-        Thread.sleep(10000l);
+        //Thread.sleep(10000l);   //页面并非sleep后才完成请求，异步监听
         System.out.println("TreadName : " + Thread.currentThread().getName());
         log.info("Received message : " + content);
         try {

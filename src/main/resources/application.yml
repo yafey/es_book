@@ -50,11 +50,9 @@ spring:
       enabled: true
       file-size-threshold: 5MB
       max-request-size: 20MB
-  activemq:
-    broker-url: tcp://localhost:61616
-    in-memory: true
-    pool:
-      enabled: true
+  rabbitmq:
+    host: localhost
+    port: 5672
 server:
   #context-path: /lida-es   设置了这个的话前端的html的静态文件引用需用 类似的request.contextPath东西，   不设置的话可直接从/static写起
   port: 8080

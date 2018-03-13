@@ -4,6 +4,8 @@ import com.lida.es_book.base.ESConstants;
 import com.lida.es_book.entity.Book;
 import com.lida.es_book.entity.Category;
 import com.lida.es_book.entity.User;
+import com.lida.es_book.esSearch.BookIndexMessage;
+import com.lida.es_book.esSearch.SearchService;
 import com.lida.es_book.redis.LoginUserKey;
 import com.lida.es_book.redis.RedisService;
 import com.lida.es_book.repository.BookDao;
@@ -38,9 +40,13 @@ public class EsBookApplicationTests {
 	private BookDao bookDao;
 	@Resource
 	private RedisService redisService;
+	@Resource
+	private SearchService searchService;
 
 	@Test
-	public void contextLoads() {
+	public void removeIndex() {
+		BookIndexMessage message = new BookIndexMessage("1520778929371355996", BookIndexMessage.REMOVE, 0);
+		searchService.removeIndex(message);
 	}
 
 	@Test

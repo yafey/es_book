@@ -17,9 +17,11 @@ import org.elasticsearch.index.reindex.DeleteByQueryAction;
 import org.elasticsearch.index.reindex.DeleteByQueryRequestBuilder;
 import org.elasticsearch.rest.RestStatus;
 import org.modelmapper.ModelMapper;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jms.annotation.JmsListener;
-import org.springframework.jms.core.JmsMessagingTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -31,11 +33,10 @@ public class SearchService {
 
     private static final String INDEX_NAME = "esbook";
     private static final String INDEX_TYPE = "book";
-    private static final String INDEX_TOPIC = "booktopic";
+    private static final String INDEX_QUEUE = "booktopic";//rabbitmq队列不能自动创建，需手动创建
 
-
-    @Autowired // 也可以注入JmsTemplate，JmsMessagingTemplate对JmsTemplate进行了封装
-    private JmsMessagingTemplate jmsTemplate;
+    @Autowired
+    private AmqpTemplate rabbitTemplate;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -46,8 +47,10 @@ public class SearchService {
     @Resource
     private ObjectMapper objectMapper;
 
-    @JmsListener(destination = INDEX_TOPIC)
-    private void handleMessage(String content) {
+    @RabbitListener(queues = INDEX_QUEUE)//异步监听
+    public void handleMessage(String content) throws InterruptedException {
+        Thread.sleep(10000l);
+        System.out.println("TreadName : " + Thread.currentThread().getName());
         log.info("Received message : " + content);
         try {
             BookIndexMessage message = objectMapper.readValue(content, BookIndexMessage.class);
@@ -101,7 +104,7 @@ public class SearchService {
 
     }
 
-    private void removeIndex(BookIndexMessage message) {
+    public void removeIndex(BookIndexMessage message) {
         String bookId = message.getBookId();
         DeleteByQueryRequestBuilder builder = DeleteByQueryAction.INSTANCE
                 .newRequestBuilder(esClient)
@@ -116,6 +119,7 @@ public class SearchService {
         }
     }
 
+    @Async
     public void index(String bookId) {
         this.index(bookId, 0);
     }
@@ -127,7 +131,8 @@ public class SearchService {
         }
         BookIndexMessage message = new BookIndexMessage(bookId, BookIndexMessage.INDEX, retry);
         try {
-            jmsTemplate.convertAndSend(INDEX_TOPIC, objectMapper.writeValueAsString(message));
+            System.out.println("TreadName : " + Thread.currentThread().getName());
+            rabbitTemplate.convertAndSend(INDEX_QUEUE, objectMapper.writeValueAsString(message));
         }catch (Exception e) {
             e.printStackTrace();
             log.error("Json encode error for : " + message);
@@ -196,13 +201,13 @@ public class SearchService {
         }
         BookIndexMessage message = new BookIndexMessage(bookId, BookIndexMessage.REMOVE, retry);
         try {
-            //this.kafkaTemplate.send(INDEX_TOPIC, objectMapper.writeValueAsString(message));
-            this.jmsTemplate.convertAndSend(INDEX_TOPIC, objectMapper.writeValueAsString(message));
+            this.rabbitTemplate.convertAndSend(INDEX_QUEUE, objectMapper.writeValueAsString(message));
         } catch (JsonProcessingException e) {
             log.error("Cannot encode json for " + message, e);
         }
     }
 
+    @Async
     public void remove(String bookId) {
         this.remove(bookId, 0);
     }

@@ -1,0 +1,2 @@
+要同步.erlang.cookie
+将C:\WINDOWS\System32\config\systemprofile\.erlang.cookie复制到C:\Users\{UserName}\.erlang.cookie

@@ -89,12 +89,15 @@ $(function () {
                     maxTime = $("#maxTime").val(),
                     categoryId = $("#categoryId").val(),
                     keyWord = $("#keyWord").val();
-                if (name.length > 0) {
+                if (keyWord.length > 0) {
+                    postData.keyWord = keyWord;
+                }
+                /*if (name.length > 0) {
                     postData.name = name;
                 }
                 if (author.length > 0) {
                     postData.author = author;
-                }
+                }*/
                 if (minPrice.length > 0) {
                     postData.minPrice = minPrice;
                 }
@@ -126,7 +129,7 @@ $(function () {
     });
 
     function reloadTable() {
-        table.ajax.reload(null, false);
+        table.ajax.reload();
     }
 });
 

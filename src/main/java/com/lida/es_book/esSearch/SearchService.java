@@ -18,10 +18,8 @@ import org.elasticsearch.index.reindex.DeleteByQueryRequestBuilder;
 import org.elasticsearch.rest.RestStatus;
 import org.modelmapper.ModelMapper;
 import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -48,9 +46,9 @@ public class SearchService {
     private ObjectMapper objectMapper;
 
     @RabbitListener(queues = INDEX_QUEUE)//异步监听
-    public void handleMessage(String content) throws InterruptedException {
+    public void handleMessage(String content) {
         //Thread.sleep(10000l);   //页面并非sleep后才完成请求，异步监听
-        //System.out.println("TreadName : " + Thread.currentThread().getName());
+        System.out.println("TreadName : " + Thread.currentThread().getName());
         //log.info("Received message : " + content);
         try {
             BookIndexMessage message = objectMapper.readValue(content, BookIndexMessage.class);
@@ -76,6 +74,7 @@ public class SearchService {
         Book book = bookDao.findOne(bookId);
         if (book == null ) {
             log.error("Index book {} dose not exist!", bookId);
+            throw new RuntimeException("Index book: "+bookId+" dose not exist!");
         }
         BookIndexTemplate bookIndexTemplate = new BookIndexTemplate();
         modelMapper.map(book, bookIndexTemplate);

@@ -13,11 +13,13 @@
     </div>
     <div class="col-xs-3 col-sm-3 col-md-3  col-lg-3">
         <a href="/book/add" class="btn btn-link pull-right">添加书籍</a>
+        <!--<a href="/book/addRandom" class="btn btn-link pull-right">添加随机书籍</a>-->
     </div>
 </div>
 <div class="row">
     <form class="form-horizontal" id="bookForm" >
-        <div class="form-group">
+        <!--这里使用es关键词的搜索方式-->
+        <!--<div class="form-group">
             <label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label">书籍名称</label>
             <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                 <input type="text" class="form-control" id="name" name="name" placeholder="请输入书籍名称" >
@@ -27,6 +29,12 @@
             <label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label">作者</label>
             <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                 <input type="text" class="form-control" id="author" name="author" placeholder="请输入作者" >
+            </div>
+        </div>-->
+        <div class="form-group">
+            <label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label">名称，作者</label>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <input type="text" class="form-control" id="keyWord" name="keyWord" placeholder="请输入名称或作者" >
             </div>
         </div>
         <div class="form-group">

@@ -31,8 +31,8 @@
             },
             success:function(data){
                 if(data.code == 200){
-                    window.location.href = "/book/list1";
-                    //window.location.href = "/book/list"; //改用datatables 记得修改delete后的重定向
+                    //window.location.href = "/book/list1";
+                    window.location.href = "/book/list"; //改用datatables 记得修改delete后的重定向
                 }else{
                     console.log(data);
                 }

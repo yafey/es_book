@@ -4,10 +4,12 @@ import com.lida.es_book.base.ApiDataTableResponse;
 import com.lida.es_book.base.ApiResponse;
 import com.lida.es_book.entity.Book;
 import com.lida.es_book.service.book.BookService;
+import com.lida.es_book.service.book.RandomBookService;
 import com.lida.es_book.web.dto.LoginUser;
 import com.lida.es_book.web.form.DataTableSearch;
 import com.lida.es_book.web.form.PageSearch;
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -29,6 +31,8 @@ public class BookController {
 
     @Resource
     private BookService bookService;
+    @Resource
+    private RandomBookService randomBookService;
 
     @GetMapping(value = "/test")
     @ResponseBody
@@ -63,18 +67,12 @@ public class BookController {
     @ResponseBody
     public ApiDataTableResponse dataTableList(@ModelAttribute DataTableSearch searchBody) {
         Long now = System.currentTimeMillis();
-        Page<Book> bookPage = bookService.findForDataTable(searchBody);
-        ApiDataTableResponse response = new ApiDataTableResponse(ApiResponse.Status.SUCCESS);
-        response.setData(bookPage.getContent());
-        response.setRecordsFiltered(bookPage.getTotalElements());
-        response.setRecordsTotal(bookPage.getTotalElements());
-
-        response.setDraw(searchBody.getDraw());
+        ApiDataTableResponse response = bookService.findForDataTable(searchBody);
+        //ApiDataTableResponse response = bookService.findFromElastic(searchBody);
         System.out.println(System.currentTimeMillis() - now + "-------------------------------");
+        response.setDraw(searchBody.getDraw());
         return response;
     }
-
-
 
     @GetMapping("/add")
     public String toAdd(Model model, LoginUser loginUser) {
@@ -84,6 +82,15 @@ public class BookController {
         model.addAttribute("action", "add");
         model.addAttribute("categories", bookService.findAllCategory());
         return "/book/form";
+    }
+
+    @GetMapping("/addRandom")
+    public String addRandom() {
+        /*for (int i = 0; i < 10000; i++) {
+            Book book = randomBookService.getRandomBook();
+            bookService.add(book);
+        }*/
+        return "redirect:/book/list";
     }
 
     @GetMapping("/update/{id}")
@@ -116,11 +123,11 @@ public class BookController {
         return ApiResponse.ofSuccess(book);
     }
 
-    @GetMapping("/delete/{id}")
+    @GetMapping("/delete/{id}")//这里其实做成异步删除比较好
     public String delete(@PathVariable("id")String id, LoginUser loginUser) {
         bookService.deleteBook(id);
-        //return "redirect:/book/list";
-        return "redirect:/book/list1";
+        return "redirect:/book/list";
+        //return "redirect:/book/list1";
     }
 
 

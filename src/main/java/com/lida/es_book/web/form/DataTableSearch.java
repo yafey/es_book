@@ -22,6 +22,7 @@ public class DataTableSearch {
     private int start;
     private int length;
 
+    private String keyWord;
     private String name;
     private String author;
     private BigDecimal minPrice;

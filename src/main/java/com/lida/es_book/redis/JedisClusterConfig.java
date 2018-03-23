@@ -13,7 +13,7 @@ import java.util.Set;
  */
 @Configuration
 public class JedisClusterConfig {
-    /*@Bean
+    @Bean
     public JedisCluster getJedisCluster() {
 
         String[] serverArray = new String[]{"192.168.60.14:6379","192.168.60.13:6379","192.168.60.12:6379","192.168.60.10:6379","192.168.60.11:6379","192.168.60.8:6379"};
@@ -25,5 +25,5 @@ public class JedisClusterConfig {
         }
 
         return new JedisCluster(nodes, 2000);
-    }*/
+    }
 }

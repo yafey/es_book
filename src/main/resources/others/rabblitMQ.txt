@@ -1,2 +1,10 @@
 要同步.erlang.cookie
 将C:\WINDOWS\System32\config\systemprofile\.erlang.cookie复制到C:\Users\{UserName}\.erlang.cookie
+
+创建用户 （rabbit默认的登陆账户为 guest guest，有所有的权限 可用 但只能localhost访问 也可将其删除）
+rabbitmqctl.bat add_user username password
+将其改为超级管理员
+rabbitmqctl.bat set_user_tags username administrator
+
+VirtualHost：
+每个VirtualHost相当月一个相对独立的RabbitMQ服务器，每个VirtualHost之间是相互隔离的
